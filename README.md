@@ -251,6 +251,28 @@ Connect to the Postgres database and copy all the queries from the "init.sql" fi
 psql 'postgres://<username>:<pwd>@<nodeip>:30003/authdb'
 ```
 
+**Login to pod and execute the query present in init.sql file**
+
+To log into a PostgreSQL pod running in Kubernetes, you'll usually go through these steps:
+
+
+### 🚪 1. **Access the Pod**
+```bash
+kubectl exec -it <postgres-pod-name> -- bash
+```
+> Replace `<postgres-pod-name>` with the actual pod name.
+
+---
+
+### 🐘 2. **Login to Postgres**
+Once inside the pod, use the `psql` command:
+```bash
+psql -U <username> -d <database>
+```
+- `<username>`: Your Postgres user (e.g. `postgres`)
+- `<database>`: Name of the DB you want to connect to (e.g. `postgres`)
+
+
 ### RabbitMQ
 
 Deploy RabbitMQ by running:
