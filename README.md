@@ -50,6 +50,48 @@ This diagram outlines an architecture for a video-to-audio conversion service, p
 - **MongoDB**: Stores the final MP3 files.
 - **Microservices (API/Converter/Notification)**: Handle specific endpoints and tasks.
 
+Yes, exactly! The **notification service** is designed to **listen** to the **mp3 queue**, and once it **receives a message** (which means an MP3 file is ready), it triggers the notification process.
+
+---
+
+### 🔔 Here's how it typically works step-by-step:
+
+1. ✅ **Converter finishes processing**
+   - Converts video to MP3
+   - Stores the MP3 in MongoDB (or blob storage)
+   - Sends a message to the **mp3 queue** with details like:
+     ```json
+     {
+       "user_id": "12345",
+       "file_id": "abcde.mp3",
+       "status": "completed",
+       "timestamp": "2025-04-19T12:00:00Z"
+     }
+     ```
+
+2. 📬 **Notification service listens** to the mp3 queue:
+   - It's like a subscriber that’s constantly waiting for new messages.
+
+3. 📣 **On message arrival**, the notification service:
+   - Parses the message
+   - Looks up the user’s contact info (email, push token, etc.)
+   - Sends:
+     - **Push notification** ("Your audio is ready to download!")
+     - **Email** (with a download link or status update)
+
+4. 🧾 (Optional) It might also log the notification or update user history in a database.
+
+---
+
+### 💡 Why this is awesome:
+- **Asynchronous**: User doesn’t need to wait.
+- **Reliable**: If notification fails, you can retry.
+- **Modular**: You can add more post-processing (e.g., analytics, logs) without touching the converter.
+
+---
+
+So yes, the notification service acts **only after** it receives a message from the **mp3 queue** — it’s the green light to notify the user that their file is ready.
+
 ---
 
 ## Deploying a Python-based Microservice Application on AWS EKS
