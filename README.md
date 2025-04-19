@@ -7,6 +7,51 @@ Converting mp4 videos to mp3 in a microservices architecture.
   <img src="./Project documentation/ProjectArchitecture.png" width="600" title="Architecture" alt="Architecture">
   </p>
 
+This diagram outlines an architecture for a video-to-audio conversion service, possibly used in a web or mobile app. Here's a step-by-step breakdown of how the system works:
+
+---
+
+### 🔁 **Workflow Description:**
+
+1. **User Request:**
+   - A user sends a request to the system (e.g., to log in, upload a video, or download audio).
+
+2. **Login (`/login` endpoint):**
+   - The request hits an API Gateway and routes to the `/login` API.
+   - User credentials are validated.
+   - On success, a **JWT token** is returned and user data is stored in a **PostgreSQL** database.
+
+3. **Upload Video (`/upload` endpoint):**
+   - The user uploads a video via `/upload`.
+   - The video is stored temporarily (perhaps on local storage or a blob store).
+   - The video is also sent to a **RabbitMQ video queue** for further processing.
+
+4. **Video Processing:**
+   - A **Converter** service picks up video tasks from the **video queue**.
+   - It converts the video into MP3 format.
+   - The MP3 file is stored in **MongoDB**.
+   - Once completed, a message is sent to the **mp3 queue**.
+
+5. **Download Audio (`/download` endpoint):**
+   - When the user accesses `/download`, the system fetches the MP3 file from **MongoDB**.
+   - The file is then served back to the user.
+
+6. **Notifications:**
+   - A notification service sends **push notifications** to the user once the MP3 is ready.
+   - It can also send an **email** to notify them of completion.
+
+---
+
+### 🧰 **Technologies Involved:**
+
+- **API Gateway**: Manages routing of requests.
+- **PostgreSQL**: Stores user credentials and login data.
+- **RabbitMQ**: Handles async messaging via video/mp3 queues.
+- **MongoDB**: Stores the final MP3 files.
+- **Microservices (API/Converter/Notification)**: Handle specific endpoints and tasks.
+
+---
+
 ## Deploying a Python-based Microservice Application on AWS EKS
 
 ### Introduction
